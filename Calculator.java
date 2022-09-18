@@ -19,6 +19,8 @@
 
 import java.util.Stack;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Calculator {
 
@@ -40,15 +42,18 @@ public class Calculator {
     private static String nextElement;
     private static Stack<String> stack = new Stack<String>();
 
-    public static void main(String[] args) {
-        String exp = "3+2-48*2/3";
-        System.out.println(Calculator.solve(exp));
-    }
+    // public static void main(String[] args) {
+
+    //         String exp = "-5*3(-6+7)(3*4)4(5)6(7)";
+    //         System.out.println("Expression : " + exp);
+    //         System.out.println("Answer : " + Calculator.solve(exp));
+
+    // }
 
     public static String solve(String exp)
     {
         try{
-            infixExpression = exp;
+            infixExpression = formatExpression(exp);
             getPostFixExpression();
        
             return PostfixSolver.solvePostfix(postfixExpression);
@@ -75,6 +80,49 @@ public class Calculator {
     public static String solvePostfixExpression(String exp)
     {
         return PostfixSolver.solvePostfix(exp);
+    }
+
+    // this method is called only when solve method is called.
+    // for getPostfixExpression() and solvePostfixExpression() it will not be called.
+
+    private static String formatExpression(String exp)
+    {
+        if(exp.startsWith("-"))
+        {
+            exp = "0" + exp;
+        }
+        exp = exp.replaceAll("\\)\\(", "\\)\\*\\(");
+       
+        Pattern pattern = Pattern.compile("\\)\\d");
+        Matcher matcher = pattern.matcher(exp);
+
+        StringBuffer str = new StringBuffer(exp);
+        int i = 1;
+
+        while(matcher.find())
+        {
+            str.insert(matcher.start() + i, "*");
+            i++;
+        }
+        exp = str.toString();
+
+        pattern = Pattern.compile("\\d\\(");
+        matcher = pattern.matcher(exp);
+
+        str = new StringBuffer(exp);
+        i = 1;
+
+        while(matcher.find())
+        {
+            str.insert(matcher.start() + i, "*");
+            i++;
+        }
+        exp = str.toString();
+
+        exp = exp.replaceAll("\\(\\-", "\\(0\\-");
+
+        System.out.println("fromatted exp : "+exp);
+        return exp;
     }
 
 

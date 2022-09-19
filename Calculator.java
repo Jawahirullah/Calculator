@@ -37,10 +37,21 @@ public class Calculator {
     // here variable nextElement is for denote the number or operator when it is taken out 
     // from the infix expression
 
-    private static String infixExpression;
-    private static String postfixExpression="";
-    private static String nextElement;
-    private static Stack<String> stack = new Stack<String>();
+    private static Calculator calculator;
+    private static PostfixSolver postfixSolver;
+
+    private String infixExpression;
+    private String postfixExpression;
+    private String nextElement;
+    private Stack<String> stack;;
+
+    private Calculator()
+    {
+        this.infixExpression = "";
+        this.postfixExpression = "";
+        this.nextElement = null;
+        this.stack = new Stack<String>();
+    }
 
     // public static void main(String[] args) {
 
@@ -50,13 +61,20 @@ public class Calculator {
 
     // }
 
-    public static String solve(String exp)
+    public static String solveExpression(String exp)
+    {
+        calculator = new Calculator();
+        return calculator.solve(exp);
+    }
+
+    public String solve(String exp)
     {
         try{
-            infixExpression = formatExpression(exp);
-            getPostFixExpression();
-       
-            return PostfixSolver.solvePostfix(postfixExpression);
+            this.infixExpression = Calculator.formatExpression(exp);
+            this.getPostfixExpression();
+            
+            postfixSolver = new PostfixSolver();
+            return postfixSolver.solvePostfix(postfixExpression);
         }
         catch(Exception e){
             return "invalid input";
@@ -69,18 +87,13 @@ public class Calculator {
     public static String getPostfixExpression(String exp)
     {
 
-        infixExpression = exp;
-        Calculator.getPostFixExpression();
+        calculator = new Calculator();
+        calculator.infixExpression = exp;
+        calculator.getPostfixExpression();
         
-        return Calculator.postfixExpression;
+        return calculator.postfixExpression;
     }
  
-    // this method is for getting answer from postfix rather than infix.
-
-    public static String solvePostfixExpression(String exp)
-    {
-        return PostfixSolver.solvePostfix(exp);
-    }
 
     // this method is called only when solve method is called.
     // for getPostfixExpression() and solvePostfixExpression() it will not be called.
@@ -121,77 +134,77 @@ public class Calculator {
 
         exp = exp.replaceAll("\\(\\-", "\\(0\\-");
 
-        System.out.println("fromatted exp : "+exp);
+        //System.out.println("fromatted exp : "+exp);
         return exp;
     }
 
 
-    private static void getPostFixExpression() {
+    private void getPostfixExpression() {
          
         StringTokenizer tokenizer = new StringTokenizer(infixExpression, OPERATORS, true);
 
         while(tokenizer.hasMoreTokens()){
             
-            nextElement = tokenizer.nextToken();
-            addNextElement();
+            this.nextElement = tokenizer.nextToken();
+            this.addNextElement();
 
         }
 
-        popAllOperators();
+        this.popAllOperators();
     }
 
 
-    private static void addNextElement() {
-        if(!nextElement.matches("[\\+\\-\\*\\/\\(\\)\\^]"))
+    private void addNextElement() {
+        if(!this.nextElement.matches("[\\+\\-\\*\\/\\(\\)\\^]"))
         {
             // if the nextElement is value
-            postfixExpression += nextElement + " ";       
+            this.postfixExpression += this.nextElement + " ";       
         }
         else{
             // if the nextElement is operator
-            if(stack.empty() || nextElement.equals("("))
+            if(this.stack.empty() || this.nextElement.equals("("))
             {
-                stack.push(nextElement);
+                this.stack.push(this.nextElement);
             }
-            else if(nextElement.equals(")"))
+            else if(this.nextElement.equals(")"))
             {
-                while(!stack.peek().equals("("))
+                while(!this.stack.peek().equals("("))
                 {
-                    postfixExpression += stack.pop() + " ";
+                    this.postfixExpression += this.stack.pop() + " ";
                 }
-                stack.pop();
+                this.stack.pop();
             }
             else
             {
-                addElementByCheckingPriority();
+                this.addElementByCheckingPriority();
             }
                 
         }
     }
 
-    private static void addElementByCheckingPriority() {
+    private void addElementByCheckingPriority() {
 
-        String topElement = stack.peek();
-        if(topElement.equals(nextElement))
+        String topElement = this.stack.peek();
+        if(topElement.equals(this.nextElement))
         {
-            postfixExpression += nextElement + " ";
+            this.postfixExpression += this.nextElement + " ";
         }
-        else if((FIRST_PRECIDENCE.contains(topElement) && SECOND_PRECIDENCE.contains(nextElement)) || (SECOND_PRECIDENCE.contains(topElement) && THIRD_PRECIDENCE.contains(nextElement)) || ((FIRST_PRECIDENCE.contains(topElement) && FIRST_PRECIDENCE.contains(nextElement)) || (SECOND_PRECIDENCE.contains(topElement) && SECOND_PRECIDENCE.contains(nextElement)) || (THIRD_PRECIDENCE.contains(topElement) && THIRD_PRECIDENCE.contains(nextElement))))
+        else if((FIRST_PRECIDENCE.contains(topElement) && SECOND_PRECIDENCE.contains(this.nextElement)) || (SECOND_PRECIDENCE.contains(topElement) && THIRD_PRECIDENCE.contains(this.nextElement)) || ((FIRST_PRECIDENCE.contains(topElement) && FIRST_PRECIDENCE.contains(this.nextElement)) || (SECOND_PRECIDENCE.contains(topElement) && SECOND_PRECIDENCE.contains(this.nextElement)) || (THIRD_PRECIDENCE.contains(topElement) && THIRD_PRECIDENCE.contains(this.nextElement))))
         {
-            postfixExpression += stack.pop() + " ";
-            addNextElement();
+            this.postfixExpression += this.stack.pop() + " ";
+            this.addNextElement();
         }
         else{
-            stack.push(nextElement);
+            this.stack.push(this.nextElement);
         }
     }
 
-    private static void popAllOperators() {
-        while(!stack.empty())
+    private void popAllOperators() {
+        while(!this.stack.empty())
         {
-            postfixExpression += stack.pop() + " ";
+            this.postfixExpression += this.stack.pop() + " ";
         }
-        postfixExpression = postfixExpression.trim();
+        this.postfixExpression = this.postfixExpression.trim();
     }
 
     /**
@@ -199,48 +212,53 @@ public class Calculator {
      */
     private class PostfixSolver {
 
-        private static String pfPostfixExpression;
-        private static String pfNextElement;
-        private static Stack<String> pfStack = new Stack<String>();
-        private static String result;
-        
-        public static String solvePostfix(String exp)
+        private String pfPostfixExpression;
+        private String pfNextElement;
+        private Stack<String> pfStack;
+        private String result;
+
+        public PostfixSolver()
         {
-            pfPostfixExpression = exp;
+            this.pfStack = new Stack<String>();
+        }
+        
+        public String solvePostfix(String exp)
+        {
+            this.pfPostfixExpression = exp;
             
             StringTokenizer tokenizer = new StringTokenizer(pfPostfixExpression, " ");
             while(tokenizer.hasMoreTokens())
             {
-                pfNextElement = tokenizer.nextToken();
-                if(!pfNextElement.matches("[\\+\\-\\*\\^\\/]"))
+                this.pfNextElement = tokenizer.nextToken();
+                if(!this.pfNextElement.matches("[\\+\\-\\*\\^\\/]"))
                 {
                     // if the next element is not operator then push it into stack.
 
-                    pfStack.push(pfNextElement);
+                    this.pfStack.push(this.pfNextElement);
                 }
                 else{
-                    PostfixSolver.solve();
+                    this.solve();
                 }
             }
             String temp = "";
 
-            if((temp = result).endsWith(".0"))
+            if((temp = this.result).endsWith(".0"))
             {
-                result = temp.replace(".0", "");
+                this.result = temp.replace(".0", "");
             }
 
-            return result;
+            return this.result;
         }
 
-        private static void solve() {
-            String value2 = pfStack.pop();
-            String value1 = pfStack.pop();
+        private void solve() {
+            String value2 = this.pfStack.pop();
+            String value1 = this.pfStack.pop();
 
             double a = Double.parseDouble(value1);
             double b = Double.parseDouble(value2);
             double answer = 0.0d;
 
-            switch (pfNextElement) {
+            switch (this.pfNextElement) {
                 case "+":
                     answer = a+b;
                     break;
@@ -260,9 +278,9 @@ public class Calculator {
                 System.out.println("unknown opertor");
                     break;
             }
-            result = Double.toString(answer);
+            this.result = Double.toString(answer);
             
-            pfStack.push(result);
+            this.pfStack.push(this.result);
         }
         
     }

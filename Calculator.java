@@ -1,5 +1,5 @@
 /*
- * this class has 3 public static methods
+ * this class has 2 public static methods
  * 
  * 1.Calculator.solveExpression(String exp)
  * -------------------------------

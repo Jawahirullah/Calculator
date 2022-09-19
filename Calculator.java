@@ -221,6 +221,7 @@ public class Calculator {
         public String solvePostfix(String exp)
         {
             this.pfPostfixExpression = exp;
+            this.result = exp;
             
             StringTokenizer tokenizer = new StringTokenizer(pfPostfixExpression, " ");
             while(tokenizer.hasMoreTokens())

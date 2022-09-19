@@ -9,10 +9,6 @@
  * -------------------------------
  * this is for converting infix(normal) expression passed in exp into postfix expression.
  * 
- * 3.Calculator.solvePostfixExpression(String exp)
- * -------------------------------
- * this is for solving postfix expression passed in exp parameter and get the result.
- * 
  */
 
 

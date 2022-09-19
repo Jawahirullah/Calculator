@@ -1,7 +1,7 @@
 /*
  * this class has 3 public static methods
  * 
- * 1.Calculator.solve(String exp)
+ * 1.Calculator.solveExpression(String exp)
  * -------------------------------
  * this is for solving infix(normal) expression passed in exp parameter and get the result.
  * 
